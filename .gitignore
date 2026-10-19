@@ -1,0 +1,4 @@
+data/
+*.ndjson
+*.ndjson.gz
+bin/

@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: audit
+      POSTGRES_PASSWORD: audit
+      POSTGRES_DB: audit
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U audit -d audit"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgres://audit:audit@postgres:5432/audit?sslmode=disable
+      PORT: "8080"
+      CURSOR_SECRET: audit-cursor-dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  load:
+    build: .
+    profiles: ["load"]
+    environment:
+      DATABASE_URL: postgres://audit:audit@postgres:5432/audit?sslmode=disable
+    volumes:
+      - ./data:/data:ro
+    entrypoint: ["/app/load"]
+    command: ["/data/audit_events.ndjson.gz"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  bench:
+    build: .
+    profiles: ["bench"]
+    environment:
+      DATABASE_URL: postgres://audit:audit@postgres:5432/audit?sslmode=disable
+      API_URL: http://api:8080
+      CURSOR_SECRET: audit-cursor-dev
+    entrypoint: ["/app/bench"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      api:
+        condition: service_started
+    restart: "no"
+
+volumes:
+  pgdata:

@@ -1,0 +1,6 @@
+.git
+data
+bin
+*.ndjson
+*.ndjson.gz
+**/*_test.go

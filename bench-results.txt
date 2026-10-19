@@ -1,0 +1,20 @@
+# Recorded 2026-10-19 after full verification on the loaded official dataset
+# SHA-256 e968244bc33aaf0bc13c98d253f49819da1236620eae8cf51de31b7fb34d4dc1
+# Command: docker compose --profile bench run --rm --build bench
+# API and Postgres on the Compose network. No discarded warmup.
+# Median is the average of the 5th and 6th sorted sample.
+# B2 timing is the final page only. Cursor lookup uses ingest_seq <= as_of and is not timed.
+
+B2 cursor is the (occurred_at, event_id) of event 100000; page starts at bbb9e108-c27f-4a34-91b8-4772d5dd998d
+B1 median_ms=0.45 samples_ms=0.87,0.50,0.42,0.36,0.38,0.39,0.34,4.21,2.66,0.49
+B2 median_ms=0.33 samples_ms=0.38,0.39,0.66,0.33,0.40,0.32,0.29,0.30,0.28,0.31
+B3 median_ms=0.37 samples_ms=0.50,0.36,0.34,0.34,0.33,0.45,0.37,3.36,0.38,0.34
+B4 median_ms=0.91 samples_ms=6.90,0.93,0.86,4.55,0.84,1.06,0.80,1.12,0.90,0.78
+disk audit_daily_counts_bytes=58032128
+disk audit_events_bytes=1109950464
+disk audit_tenant_seq_bytes=1130496
+disk total_bytes=1169113088
+
+# Dataset: lines=2001032 inserted=1980386 duplicates_in_file=20646
+# Fresh load seconds=34.836007594
+# disk total_bytes matches the three tables including indexes
